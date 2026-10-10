@@ -1,6 +1,6 @@
 # done
 
-A tiny terminal task finisher.
+A terminal task finisher.
 
 ## Commands
 
@@ -9,7 +9,8 @@ done                      # Open the task list
 done add "Write README"   # Add a task to the list
 done ls                   # Print task list
 done finish 2             # Check off a task
-done clear                # Clear the task list     
+done clear                # Clear completed tasks  
 ```
 
-Tasks will be stored as JSON in the user's config directory.
+Tasks are stored in `done/tasks.json` under the user's config directory (for example,
+`~/Library/Application Support/done/tasks.json` on macOS).

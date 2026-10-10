@@ -1,14 +1,14 @@
-// Package cli routes command-line arguments to the task store or interactive UI.
 package cli
 
 import (
-	"errors"
 	"fmt"
+	"strings"
 
+	"done/internal/task"
 	"done/internal/tui"
 )
 
-const usage = `done — a tiny terminal task finisher
+const usage = `done - a terminal task finisher
 
 Usage:
   done                         Open the task list
@@ -27,9 +27,30 @@ func Run(args []string) error {
 	case "help", "-h", "--help":
 		fmt.Print(usage)
 		return nil
-	case "add", "ls", "finish", "clear":
-		return errors.New("in progress")
+	case "add":
+		return add(args[1:])
+	case "ls", "finish", "clear":
+		return fmt.Errorf("%s is not implemented yet", args[0])
 	default:
 		return fmt.Errorf("unknown command %q\n\n%s", args[0], usage)
 	}
+}
+
+func add(args []string) error {
+	title := strings.TrimSpace(strings.Join(args, " "))
+	if title == "" {
+		return fmt.Errorf("provide a task title\n\n%s", usage)
+	}
+
+	store, err := task.NewStore()
+	if err != nil {
+		return err
+	}
+	added, err := store.Add(title)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Added #%d: %s\n", added.ID, added.Title)
+	return nil
 }
