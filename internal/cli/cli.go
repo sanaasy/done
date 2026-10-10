@@ -29,7 +29,9 @@ func Run(args []string) error {
 		return nil
 	case "add":
 		return add(args[1:])
-	case "ls", "finish", "clear":
+	case "ls":
+		return list()
+	case "finish", "clear":
 		return fmt.Errorf("%s is not implemented yet", args[0])
 	default:
 		return fmt.Errorf("unknown command %q\n\n%s", args[0], usage)
@@ -52,5 +54,29 @@ func add(args []string) error {
 	}
 
 	fmt.Printf("Added #%d: %s\n", added.ID, added.Title)
+	return nil
+}
+
+func list() error {
+	store, err := task.NewStore()
+	if err != nil {
+		return err
+	}
+	tasks, err := store.Load()
+	if err != nil {
+		return err
+	}
+
+	open := 0
+	for _, item := range tasks {
+		if item.Completed {
+			continue
+		}
+		fmt.Printf("%d. %s\n", item.ID, item.Title)
+		open++
+	}
+	if open == 0 {
+		fmt.Println("No open tasks.")
+	}
 	return nil
 }
