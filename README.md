@@ -21,7 +21,3 @@ Tasks are stored as JSON at `done/tasks.json` under the user's config directory.
 ## Demo
 
 ![done demo](demo.gif)
-
-[Download the MP4](demo.mp4).
-
-With [VHS](https://github.com/charmbracelet/vhs) installed, run `vhs demo.tape` from the project directory to make `demo.gif`.
