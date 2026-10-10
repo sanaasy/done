@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -81,6 +82,11 @@ func (s *Store) Save(tasks []Task) error {
 }
 
 func (s *Store) Add(title string) (Task, error) {
+	title = strings.TrimSpace(title)
+	if title == "" {
+		return Task{}, fmt.Errorf("task title cannot be empty")
+	}
+
 	tasks, err := s.Load()
 	if err != nil {
 		return Task{}, err
@@ -99,4 +105,54 @@ func (s *Store) Add(title string) (Task, error) {
 		return Task{}, err
 	}
 	return added, nil
+}
+
+func (s *Store) SetCompleted(id int, completed bool) (Task, error) {
+	tasks, err := s.Load()
+	if err != nil {
+		return Task{}, err
+	}
+
+	for i := range tasks {
+		if tasks[i].ID != id {
+			continue
+		}
+		if tasks[i].Completed != completed {
+			tasks[i].Completed = completed
+			if completed {
+				tasks[i].CompletedAt = time.Now()
+			} else {
+				tasks[i].CompletedAt = time.Time{}
+			}
+			if err := s.Save(tasks); err != nil {
+				return Task{}, err
+			}
+		}
+		return tasks[i], nil
+	}
+	return Task{}, fmt.Errorf("task #%d not found", id)
+}
+
+func (s *Store) Clear() (int, error) {
+	tasks, err := s.Load()
+	if err != nil {
+		return 0, err
+	}
+
+	remaining := make([]Task, 0, len(tasks))
+	removed := 0
+	for _, item := range tasks {
+		if item.Completed {
+			removed++
+			continue
+		}
+		remaining = append(remaining, item)
+	}
+	if removed == 0 {
+		return 0, nil
+	}
+	if err := s.Save(remaining); err != nil {
+		return 0, err
+	}
+	return removed, nil
 }

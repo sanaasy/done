@@ -5,12 +5,11 @@ A terminal task finisher.
 ## Commands
 
 ```text
-done                      # Open the task list
-done add "Write README"   # Add a task to the list
-done ls                   # Print task list
-done finish 2             # Check off a task
-done clear                # Clear completed tasks  
+done                      # open the task list
+done add "Write README"   # add a task
+done ls                   # list open tasks
+done check <task id>      # mark a task as completed
+done clear                # remove completed tasks
 ```
 
-Tasks are stored in `done/tasks.json` under the user's config directory (for example,
-`~/Library/Application Support/done/tasks.json` on macOS).
+Tasks are stored as JSON at `done/tasks.json` under the user's config directory.

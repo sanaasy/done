@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"done/internal/task"
@@ -11,11 +12,11 @@ import (
 const usage = `done - a terminal task finisher
 
 Usage:
-  done                         Open the task list
-  done add "Task description"  Add a task
-  done ls                      List outstanding tasks
-  done finish <id>             Mark a task complete
-  done clear                   Remove completed tasks
+  done                         open the task list
+  done add "task description"  add a task
+  done ls                      list outstanding tasks
+  done check <id>              mark a task complete
+  done clear                   remove completed tasks
 `
 
 func Run(args []string) error {
@@ -31,8 +32,10 @@ func Run(args []string) error {
 		return add(args[1:])
 	case "ls":
 		return list()
-	case "finish", "clear":
-		return fmt.Errorf("%s is not implemented yet", args[0])
+	case "check":
+		return check(args[1:])
+	case "clear":
+		return clear(args[1:])
 	default:
 		return fmt.Errorf("unknown command %q\n\n%s", args[0], usage)
 	}
@@ -53,7 +56,7 @@ func add(args []string) error {
 		return err
 	}
 
-	fmt.Printf("Added #%d: %s\n", added.ID, added.Title)
+	fmt.Printf("added #%d: %s\n", added.ID, added.Title)
 	return nil
 }
 
@@ -76,7 +79,51 @@ func list() error {
 		open++
 	}
 	if open == 0 {
-		fmt.Println("No open tasks.")
+		fmt.Println("no open tasks.")
 	}
+	return nil
+}
+
+func check(args []string) error {
+	if len(args) != 1 {
+		return fmt.Errorf("usage: done check <id>")
+	}
+	id, err := strconv.Atoi(args[0])
+	if err != nil || id < 1 {
+		return fmt.Errorf("task ID must be a positive num")
+	}
+	store, err := task.NewStore()
+	if err != nil {
+		return err
+	}
+	item, err := store.SetCompleted(id, true)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("finished #%d: %s\n", item.ID, item.Title)
+	return nil
+}
+
+func clear(args []string) error {
+	if len(args) != 0 {
+		return fmt.Errorf("usage: done clear")
+	}
+	store, err := task.NewStore()
+	if err != nil {
+		return err
+	}
+	removed, err := store.Clear()
+	if err != nil {
+		return err
+	}
+	if removed == 0 {
+		fmt.Println("no tasks to clear.")
+		return nil
+	}
+	label := "tasks"
+	if removed == 1 {
+		label = "task"
+	}
+	fmt.Printf("cleared %d %s.\n", removed, label)
 	return nil
 }
