@@ -12,11 +12,14 @@ import (
 )
 
 var (
-	titleStyle    = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#c4a1ff"))
-	mutedStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("#777784"))
-	selectedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#d6b8ff"))
-	doneStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("#79cba0")).Strikethrough(true)
-	errorStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("#f28b82"))
+	titleStyle      = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#c6a5eb"))
+	mutedStyle      = lipgloss.NewStyle().Foreground(lipgloss.Color("#a3a3ad"))
+	selectedStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#d0a7f0"))
+	activeMarkStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#f0ad78"))
+	doneMarkStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#a6d5a8"))
+	doneStyle       = lipgloss.NewStyle().Foreground(lipgloss.Color("#858590")).Strikethrough(true)
+	progressStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#d486a2"))
+	errorStyle      = lipgloss.NewStyle().Foreground(lipgloss.Color("#f28b82"))
 )
 
 type model struct {
@@ -124,17 +127,17 @@ func (m model) View() tea.View {
 			if i == len(m.tasks)-1 {
 				branch = "└─"
 			}
-			marker, style := "○", mutedStyle
+			marker, markerStyle, labelStyle := "○", mutedStyle, mutedStyle
 			if item.Completed {
-				marker, style = "✓", doneStyle
+				marker, markerStyle, labelStyle = "✓", doneMarkStyle, doneStyle
 			} else if i == m.cursor {
-				marker, style = "◐", selectedStyle
+				marker, markerStyle, labelStyle = "◐", activeMarkStyle, selectedStyle
 			}
 			pointer := "  "
 			if i == m.cursor {
 				pointer = "› "
 			}
-			fmt.Fprintf(&out, "%s%s %s %s\n", pointer, mutedStyle.Render(branch), style.Render(marker), style.Render(item.Title))
+			fmt.Fprintf(&out, "%s%s %s %s\n", pointer, mutedStyle.Render(branch), markerStyle.Render(marker), labelStyle.Render(item.Title))
 		}
 	}
 
@@ -180,5 +183,5 @@ func progress(done, total, width int) string {
 	if total > 0 {
 		filled = done * width / total
 	}
-	return selectedStyle.Render(strings.Repeat("━", filled)) + mutedStyle.Render(strings.Repeat("─", width-filled))
+	return progressStyle.Render(strings.Repeat("━", filled)) + mutedStyle.Render(strings.Repeat("─", width-filled))
 }

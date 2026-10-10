@@ -17,3 +17,7 @@ and `q` to quit. The footer shows today's completion progress; quitting prints a
 session summary.
 
 Tasks are stored as JSON at `done/tasks.json` under the user's config directory.
+
+## Demo
+
+With [VHS](https://github.com/charmbracelet/vhs) installed, run `vhs demo.tape` from the project directory to make `demo.gif`.
