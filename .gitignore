@@ -1,0 +1,13 @@
+# Binaries
+/done
+/bin/
+
+# Go build and test output
+*.test
+*.out
+coverage.out
+
+# Editor / OS files
+.DS_Store
+.idea/
+.vscode/
